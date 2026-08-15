@@ -2,7 +2,7 @@
 
 A lightweight, dependency-free HTML5/JavaScript remake of the iconic 1983 Bally Midway arcade game **Tapper**. Features a custom arcade cabinet bezel, procedural pixel art, 4-lane mechanics, and retro synthesized Web Audio API sound effects.
 
-🚀 **[Play the Live Demo]([https://YOUR-USERNAME.github.io/YOUR-REPO-NAME/](https://andrejverity.github.io/tapper/))**
+🚀 **[Play the Live Demo](https://andrejverity.github.io/tapper/)**
 
 ---
 
