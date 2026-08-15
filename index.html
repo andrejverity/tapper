@@ -802,12 +802,16 @@ function update() {
         loseLife("Customer reached the tap!");
         return;
       }
-    } else if (c.state === 'drinking') {
+} else if (c.state === 'drinking') {
       c.x -= 1.5; // Drink and push backward toward door
       c.drinkTimer--;
 
-      if (c.x <= BAR_LEFT || c.drinkTimer <= 0) {
-        // Finished drink -> send empty mug sliding back right
+      // Pushed all the way out the saloon door -> customer leaves, NO empty mug
+      if (c.x <= BAR_LEFT) {
+        customers.splice(i, 1);
+      } 
+      // Finished drinking while still at the bar -> slide empty mug back
+      else if (c.drinkTimer <= 0) {
         emptyMugs.push({
           lane: c.lane,
           x: c.x + 10,
