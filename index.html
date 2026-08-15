@@ -853,13 +853,6 @@ function update() {
       gameState = 'PLAYING';
     }, 2000);
   }
-// Level Completion Check
-  if (customers.length === 0 && spawner.totalSpawned >= spawner.maxCustomers) {
-    score += 1000; // Bonus for clearing the level
-    sound.playLevelWin();
-    nextLevel();
-  }
-
   
 }
 
