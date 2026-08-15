@@ -393,6 +393,7 @@
       <div><span class="key-badge">UP / DOWN</span> Change Lane</div>
       <div><span class="key-badge">LEFT / RIGHT</span> Run Along Bar</div>
       <div><span class="key-badge">SPACE</span> Pour / Serve Beer</div>
+      <div><span class="key-badge">M</span> Mute / Unmute Music</div>
     </div>
   </div>
 
@@ -403,6 +404,11 @@
 class SoundEngine {
   constructor() {
     this.ctx = null;
+    this.isMuted = false; // Add mute state flag
+  }
+
+  toggleMute() {
+    this.isMuted = !this.isMuted;
   }
 
   init() {
@@ -436,8 +442,10 @@ playMusic() {
       
       osc.type = 'square'; // Retro arcade wave
       osc.frequency.setValueAtTime(notes[noteIndex], this.ctx.currentTime);
-      
-      gain.gain.setValueAtTime(0.005, this.ctx.currentTime);
+
+      // If muted, set volume to 0; otherwise use normal volume
+      const volume = this.isMuted ? 0 : 0.005;
+      gain.gain.setValueAtTime(volume, this.ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.18);
       
       osc.connect(gain);
@@ -596,6 +604,12 @@ const keys = {};
 
 window.addEventListener('keydown', (e) => {
   sound.init();
+
+  if (e.key === 'm' || e.key === 'M') {
+    sound.toggleMute();
+    return;
+  }
+  
   if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
     e.preventDefault();
   }
