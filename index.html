@@ -781,11 +781,11 @@ function update() {
     }
   }
 
-  // Update Tips
+// Tip Collection Logic
   for (let i = tips.length - 1; i >= 0; i--) {
-    let tip = tips[i];
-    if (player.lane === tip.lane && Math.abs(player.x - tip.x) < 20) {
-      score += tip.value;
+    let t = tips[i];
+    if (player.lane === t.lane && Math.abs(player.x - t.x) < 20) {
+      score += 1500; // Updated from 500/1000 to 1,500 points
       sound.playTip();
       tips.splice(i, 1);
     }
@@ -809,6 +809,14 @@ function update() {
       gameState = 'PLAYING';
     }, 2000);
   }
+// Level Completion Check
+  if (customers.length === 0 && spawner.totalSpawned >= spawner.maxCustomers) {
+    score += 1000; // Bonus for clearing the level
+    sound.playLevelWin();
+    nextLevel();
+  }
+
+  
 }
 
 function createSpillParticles(x, y) {
