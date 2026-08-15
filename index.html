@@ -1029,42 +1029,46 @@ function drawSaloonBackground() {
 }
 
 function drawBartender() {
-  let y = LANE_Y[player.lane] - 30;
-  let x = player.x;
+  let baseY = LANE_Y[player.lane] - 38;
+  let baseX = player.x - 12;
 
-  // Bartender Sprite (Pixel Art style rendering)
-  // Head / Hair
-  ctx.fillStyle = '#222';
-  ctx.fillRect(x - 8, y - 18, 16, 8); // Hair
-  ctx.fillStyle = '#ffcc99';
-  ctx.fillRect(x - 8, y - 10, 16, 10); // Face
-  
-  // Eyes & Mustache
-  ctx.fillStyle = '#000';
-  ctx.fillRect(x + (player.x >= TAP_X ? -6 : 2), y - 7, 3, 3);
-  ctx.fillRect(x - 6, y - 3, 12, 3); // Mustache
+  // --- LEGS & SHOES ---
+  ctx.fillStyle = '#8b4513'; // Trousers
+  ctx.fillRect(baseX + 6, baseY + 30, 6, 14);
+  ctx.fillRect(baseX + 14, baseY + 30, 6, 14);
 
-  // Bowtie
-  ctx.fillStyle = '#cc0000';
-  ctx.fillRect(x - 4, y, 8, 4);
+  ctx.fillStyle = '#d4af37'; // Shoes
+  ctx.fillRect(baseX + 4, baseY + 42, 9, 5);
+  ctx.fillRect(baseX + 13, baseY + 42, 9, 5);
 
-  // Blue Vest & White Shirt
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(x - 10, y + 4, 20, 16);
-  ctx.fillStyle = '#003399';
-  ctx.fillRect(x - 10, y + 4, 5, 16);
-  ctx.fillRect(x + 5, y + 4, 5, 16);
+  // --- VEST & SHIRT ---
+  ctx.fillStyle = '#ffffff'; // White sleeves
+  ctx.fillRect(baseX + 2, baseY + 14, 6, 12);
+  ctx.fillRect(baseX + 18, baseY + 14, 6, 12);
 
-  // Pants
-  ctx.fillStyle = '#4a2e18';
-  ctx.fillRect(x - 8, y + 20, 16, 14);
+  ctx.fillStyle = '#1e3f8a'; // Blue vest body
+  ctx.fillRect(baseX + 7, baseY + 12, 12, 18);
 
-  // Pouring Animation Progress Bar
+  ctx.fillStyle = '#ffaa00'; // Gold vest buttons
+  ctx.fillRect(baseX + 12, baseY + 18, 2, 2);
+  ctx.fillRect(baseX + 12, baseY + 23, 2, 2);
+
+  // --- HEAD & FACE ---
+  ctx.fillStyle = '#ffcc99'; // Skin
+  ctx.fillRect(baseX + 8, baseY + 2, 10, 11);
+
+  ctx.fillStyle = '#111111'; // Black hair
+  ctx.fillRect(baseX + 7, baseY, 12, 4);
+
+  ctx.fillStyle = '#cc0000'; // Red bow tie
+  ctx.fillRect(baseX + 9, baseY + 11, 8, 4);
+
+  // --- POURING PROGRESS BAR ---
   if (player.isPouring) {
     ctx.fillStyle = '#222';
-    ctx.fillRect(x - 15, y - 30, 30, 8);
+    ctx.fillRect(baseX - 4, baseY - 10, 32, 6);
     ctx.fillStyle = '#ffea00';
-    ctx.fillRect(x - 13, y - 28, 26 * player.pourProgress, 4);
+    ctx.fillRect(baseX - 3, baseY - 9, 30 * player.pourProgress, 4);
   }
 }
 
