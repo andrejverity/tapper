@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tapper - Arcade Classic (1983)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background-color: #0d0a08;
+      background-image: 
+        radial-gradient(circle at 50% 30%, #2a1f18 0%, #080503 100%),
+        repeating-linear-gradient(45deg, #110d0a 0px, #110d0a 10px, #0a0705 10px, #0a0705 20px);
+      font-family: 'Press Start 2P', monospace, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      overflow: hidden;
+    }
+
+    /* --- ARCADE CABINET WRAPPER --- */
+    #arcade-cabinet {
+      position: relative;
+      width: 920px;
+      background: linear-gradient(180deg, #3d2314 0%, #1c0d06 100%);
+      border: 12px solid #5a3821;
+      border-radius: 20px;
+      box-shadow: 
+        0 0 50px rgba(0, 0, 0, 0.9),
+        inset 0 0 25px rgba(0, 0, 0, 0.8),
+        inset 0 0 10px rgba(255, 200, 100, 0.2);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Cabinet Brass Rails / Trim Sides */
+    #arcade-cabinet::before, #arcade-cabinet::after {
+      content: '';
+      position: absolute;
+      top: 10%;
+      bottom: 10%;
+      width: 14px;
+      background: linear-gradient(90deg, #d4af37, #fff6cc, #aa820a);
+      border-radius: 6px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+    }
+    #arcade-cabinet::before { left: -18px; }
+    #arcade-cabinet::after { right: -18px; }
+
+    /* --- ARCADE MARQUEE --- */
+    #marquee {
+      width: 100%;
+      height: 90px;
+      background: linear-gradient(180deg, #8b0000 0%, #4a0000 100%);
+      border: 4px solid #d4af37;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 
+        0 0 20px #ff3300,
+        inset 0 0 15px rgba(255, 255, 255, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #marquee-title {
+      font-size: 42px;
+      color: #ffea00;
+      text-shadow: 
+        4px 4px 0px #b30000,
+        -2px -2px 0px #fff,
+        0 0 15px #ffaa00;
+      letter-spacing: 4px;
+      z-index: 2;
+    }
+
+    .tap-decor {
+      position: absolute;
+      width: 50px;
+      height: 70px;
+      background: linear-gradient(135deg, #cc9900, #ffe680, #806000);
+      border-radius: 8px;
+      border: 2px solid #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.6);
+    }
+    .tap-decor.left { left: 20px; }
+    .tap-decor.right { right: 20px; }
+    .tap-handle {
+      width: 12px;
+      height: 35px;
+      background: #8b0000;
+      border-radius: 4px;
+      border: 1px solid #ffcc00;
+    }
+
+    /* --- SCREEN CRT BEZEL --- */
+    #screen-bezel {
+      position: relative;
+      background: #000;
+      padding: 16px;
+      border-radius: 30px;
+      border: 8px solid #222;
+      box-shadow: 
+        inset 0 0 20px rgba(255, 255, 255, 0.1),
+        0 0 15px rgba(0, 0, 0, 0.8);
+    }
+
+    canvas {
+      display: block;
+      background-color: #000;
+      border-radius: 12px;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    /* CRT Scanline Overlay Effect */
+    #crt-overlay {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      width: 800px;
+      height: 600px;
+      border-radius: 12px;
+      background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%, 
+        rgba(0, 0, 0, 0.25) 50%
+      ), linear-gradient(
+        90deg,
+        rgba(255, 0, 0, 0.03),
+        rgba(0, 255, 0, 0.01),
+        rgba(0, 0, 255, 0.03)
+      );
+      background-size: 100% 4px, 6px 100%;
+      pointer-events: none;
+      box-shadow: inset 0 0 80px rgba(0,0,0,0.6);
+    }
+
+    /* --- CABINET LOWER CONTROL PANEL --- */
+    #control-panel {
+      width: 100%;
+      margin-top: 15px;
+      background: linear-gradient(180deg, #111 0%, #222 100%);
+      border: 3px solid #d4af37;
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      font-size: 11px;
+      color: #aaa;
+    }
+
+    .key-badge {
+      background: #333;
+      color: #ffea00;
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid #666;
+      font-size: 10px;
+      display: inline-block;
+      margin: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="arcade-cabinet">
+    <!-- Marquee -->
+    <div id="marquee">
+      <div class="tap-decor left"><div class="tap-handle"></div></div>
+      <div id="marquee-title">TAPPER</div>
+      <div class="tap-decor right"><div class="tap-handle"></div></div>
+    </div>
+
+    <!-- Screen Bezel -->
+    <div id="screen-bezel">
+      <canvas id="gameCanvas" width="800" height="600"></canvas>
+      <div id="crt-overlay"></div>
+    </div>
+
+    <!-- Controls Banner -->
+    <div id="control-panel">
+      <div><span class="key-badge">UP / DOWN</span> Change Lane</div>
+      <div><span class="key-badge">LEFT / RIGHT</span> Run Along Bar</div>
+      <div><span class="key-badge">SPACE</span> Pour / Serve Beer</div>
+    </div>
+  </div>
+
+<script>
+// ============================================================================
+// AUDIO ENGINE (WEB AUDIO API SYNTHESIZER)
+// ============================================================================
+class SoundEngine {
+  constructor() {
+    this.ctx = null;
+  }
+
+  init() {
+    if (!this.ctx) {
+      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+  }
+
+  playPour() {
+    if (!this.ctx) return;
+    const bufferSize = this.ctx.sampleRate * 0.15;
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = buffer;
+
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(400, this.ctx.currentTime);
+    filter.frequency.exponentialRampToValueAtTime(1200, this.ctx.currentTime + 0.15);
+
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.ctx.destination);
+    noise.start();
+  }
+
+  playCatch() {
+    if (!this.ctx) return;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(523.25, this.ctx.currentTime); // C5
+    osc.frequency.setValueAtTime(659.25, this.ctx.currentTime + 0.05); // E5
+    osc.frequency.setValueAtTime(783.99, this.ctx.currentTime + 0.1); // G5
+
+    gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start();
+    osc.stop(this.ctx.currentTime + 0.2);
+  }
+
+  playCrash() {
+    if (!this.ctx) return;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(300, this.ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(40, this.ctx.currentTime + 0.3);
+
+    gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start();
+    osc.stop(this.ctx.currentTime + 0.3);
+  }
+
+  playTip() {
+    if (!this.ctx) return;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(987.77, this.ctx.currentTime); // B5
+    osc.frequency.setValueAtTime(1318.51, this.ctx.currentTime + 0.08); // E6
+
+    gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.25);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start();
+    osc.stop(this.ctx.currentTime + 0.25);
+  }
+
+  playStep() {
+    if (!this.ctx) return;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.04);
+
+    gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.04);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start();
+    osc.stop(this.ctx.currentTime + 0.04);
+  }
+}
+
+const sound = new SoundEngine();
+
+// ============================================================================
+// GAME INITIALIZATION & CONSTANTS
+// ============================================================================
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+const LANES = 4;
+const LANE_Y = [160, 260, 360, 460];
+const BAR_LEFT = 140;
+const BAR_RIGHT = 680;
+const TAP_X = 690;
+
+let gameState = 'TITLE'; // 'TITLE', 'PLAYING', 'LEVEL_COMPLETE', 'GAMEOVER'
+let score = 0;
+let lives = 3;
+let level = 1;
+let spawnTimer = 0;
+let levelCustomersLeft = 0;
+
+// Player Bartender
+const player = {
+  lane: 0,
+  x: TAP_X,
+  isPouring: false,
+  pourProgress: 0,
+  speed: 6
+};
+
+// Game Entities
+let customers = [];
+let fullMugs = [];
+let emptyMugs = [];
+let tips = [];
+let particles = [];
+
+// Input Handling
+const keys = {};
+
+window.addEventListener('keydown', (e) => {
+  sound.init();
+  if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+    e.preventDefault();
+  }
+
+  if (gameState === 'TITLE' || gameState === 'GAMEOVER') {
+    if (e.key === ' ' || e.key === 'Enter') {
+      resetGame();
+      gameState = 'PLAYING';
+    }
+    return;
+  }
+
+  if (!keys[e.key]) {
+    keys[e.key] = true;
+
+    if (e.key === 'ArrowUp') {
+      if (player.lane > 0) {
+        player.lane--;
+        player.x = TAP_X;
+        sound.playStep();
+      }
+    } else if (e.key === 'ArrowDown') {
+      if (player.lane < LANES - 1) {
+        player.lane++;
+        player.x = TAP_X;
+        sound.playStep();
+      }
+    }
+  }
+});
+
+window.addEventListener('keyup', (e) => {
+  keys[e.key] = false;
+});
+
+// Touch controls support for mobile
+canvas.addEventListener('touchstart', (e) => {
+  sound.init();
+  if (gameState === 'TITLE' || gameState === 'GAMEOVER') {
+    resetGame();
+    gameState = 'PLAYING';
+    return;
+  }
+  const touch = e.touches[0];
+  const rect = canvas.getBoundingClientRect();
+  const touchY = touch.clientY - rect.top;
+  const touchX = touch.clientX - rect.left;
+
+  if (touchX > 500) {
+    // Tap on right side: pour or switch lane
+    const clickedLane = Math.floor((touchY - 100) / 100);
+    if (clickedLane >= 0 && clickedLane < LANES) {
+      if (player.lane === clickedLane && player.x >= TAP_X - 10) {
+        keys[' '] = true;
+        setTimeout(() => { keys[' '] = false; }, 200);
+      } else {
+        player.lane = clickedLane;
+        player.x = TAP_X;
+      }
+    }
+  }
+});
+
+// ============================================================================
+// GAME LOGIC & LOOPS
+// ============================================================================
+function resetGame() {
+  score = 0;
+  lives = 3;
+  level = 1;
+  startLevel();
+}
+
+function startLevel() {
+  customers = [];
+  fullMugs = [];
+  emptyMugs = [];
+  tips = [];
+  particles = [];
+  player.lane = 0;
+  player.x = TAP_X;
+  player.isPouring = false;
+  player.pourProgress = 0;
+  levelCustomersLeft = 6 + level * 3;
+  spawnTimer = 0;
+}
+
+function spawnCustomer() {
+  if (levelCustomersLeft <= 0) return;
+  const lane = Math.floor(Math.random() * LANES);
+  const types = ['cowboy', 'patron', 'biker'];
+  const type = types[Math.floor(Math.random() * types.length)];
+  
+  customers.push({
+    lane: lane,
+    x: BAR_LEFT,
+    speed: 0.6 + Math.random() * 0.4 + (level * 0.1),
+    state: 'walking', // 'walking', 'drinking'
+    drinkTimer: 0,
+    type: type
+  });
+  levelCustomersLeft--;
+}
+
+function update() {
+  if (gameState !== 'PLAYING') return;
+
+  // Spawning Customers
+  spawnTimer++;
+  if (spawnTimer > Math.max(80, 180 - level * 15)) {
+    spawnCustomer();
+    spawnTimer = 0;
+  }
+
+  // Player Movement along the bar
+  if (keys['ArrowLeft']) {
+    player.x = Math.max(BAR_LEFT + 20, player.x - player.speed);
+  } else if (keys['ArrowRight']) {
+    player.x = Math.min(TAP_X, player.x + player.speed);
+  }
+
+  // Pouring Beer Logic
+  // Instant Serve / Pouring Beer Logic
+  if (keys[' '] && player.x >= TAP_X - 10) {
+    if (!player.isPouring) {
+      player.isPouring = true;
+      sound.playPour();
+      
+      // Serve Full Mug immediately on press
+      fullMugs.push({
+        lane: player.lane,
+        x: TAP_X - 25,
+        speed: 4.5
+      });
+    }
+  } else {
+    player.isPouring = false;
+  }
+
+  // Update Full Mugs
+  for (let i = fullMugs.length - 1; i >= 0; i--) {
+    let mug = fullMugs[i];
+    mug.x -= mug.speed;
+
+    // Check collision with customers
+    let served = false;
+    for (let c of customers) {
+      if (c.lane === mug.lane && c.state === 'walking' && Math.abs(c.x - mug.x) < 25) {
+        c.state = 'drinking';
+        c.drinkTimer = 60; // frames to drink
+        served = true;
+        score += 100;
+        sound.playCatch();
+        
+        // Random chance to spawn a tip
+        if (Math.random() < 0.3) {
+          tips.push({ lane: c.lane, x: c.x, value: 50 });
+        }
+        break;
+      }
+    }
+
+    if (served) {
+      fullMugs.splice(i, 1);
+      continue;
+    }
+
+    // Mug fell off left end of bar!
+    if (mug.x <= BAR_LEFT - 10) {
+      createSpillParticles(BAR_LEFT, LANE_Y[mug.lane]);
+      sound.playCrash();
+      fullMugs.splice(i, 1);
+      loseLife("Full mug fell off the bar!");
+    }
+  }
+
+  // Update Customers
+  for (let i = customers.length - 1; i >= 0; i--) {
+    let c = customers[i];
+
+    if (c.state === 'walking') {
+      c.x += c.speed;
+
+      // Customer reached the right tap (Overran the bar!)
+      if (c.x >= TAP_X - 20) {
+        customers.splice(i, 1);
+        sound.playCrash();
+        loseLife("Customer reached the tap!");
+        return;
+      }
+    } else if (c.state === 'drinking') {
+      c.x -= 1.5; // Drink and push backward toward door
+      c.drinkTimer--;
+
+      if (c.x <= BAR_LEFT || c.drinkTimer <= 0) {
+        // Finished drink -> send empty mug sliding back right
+        emptyMugs.push({
+          lane: c.lane,
+          x: c.x + 10,
+          speed: 3.0
+        });
+        customers.splice(i, 1);
+      }
+    }
+  }
+
+  // Update Empty Mugs sliding back toward bartender
+  for (let i = emptyMugs.length - 1; i >= 0; i--) {
+    let mug = emptyMugs[i];
+    mug.x += mug.speed;
+
+    // Player catches empty mug
+    if (player.lane === mug.lane && Math.abs(player.x - mug.x) < 25) {
+      emptyMugs.splice(i, 1);
+      score += 100;
+      sound.playCatch();
+      continue;
+    }
+
+    // Empty mug fell off right end of bar!
+    if (mug.x >= TAP_X + 15) {
+      createSpillParticles(TAP_X, LANE_Y[mug.lane]);
+      sound.playCrash();
+      emptyMugs.splice(i, 1);
+      loseLife("Empty mug smashed!");
+    }
+  }
+
+  // Update Tips
+  for (let i = tips.length - 1; i >= 0; i--) {
+    let tip = tips[i];
+    if (player.lane === tip.lane && Math.abs(player.x - tip.x) < 20) {
+      score += tip.value;
+      sound.playTip();
+      tips.splice(i, 1);
+    }
+  }
+
+  // Particles
+  for (let i = particles.length - 1; i >= 0; i--) {
+    let p = particles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life--;
+    if (p.life <= 0) particles.splice(i, 1);
+  }
+
+  // Check Level Clear
+  if (levelCustomersLeft <= 0 && customers.length === 0 && fullMugs.length === 0 && emptyMugs.length === 0) {
+    level++;
+    gameState = 'LEVEL_COMPLETE';
+    setTimeout(() => {
+      startLevel();
+      gameState = 'PLAYING';
+    }, 2000);
+  }
+}
+
+function createSpillParticles(x, y) {
+  for (let i = 0; i < 15; i++) {
+    particles.push({
+      x: x,
+      y: y,
+      vx: (Math.random() - 0.5) * 6,
+      vy: (Math.random() - 0.8) * 5,
+      life: 25,
+      color: Math.random() < 0.5 ? '#ffea00' : '#ffffff'
+    });
+  }
+}
+
+function loseLife(reason) {
+  lives--;
+  if (lives <= 0) {
+    gameState = 'GAMEOVER';
+  } else {
+    // Soft reset lane positions
+    customers = [];
+    fullMugs = [];
+    emptyMugs = [];
+    player.x = TAP_X;
+  }
+}
+
+// ============================================================================
+// PROCEDURAL CANVAS GRAPHICS & SPRITE RENDERING
+// ============================================================================
+function draw() {
+  // Clear screen
+  ctx.fillStyle = '#0a0a16';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  if (gameState === 'TITLE') {
+    drawTitleScreen();
+    return;
+  }
+
+  // Draw Background Saloon Scene
+  drawSaloonBackground();
+
+  // Draw Tips
+  for (let tip of tips) {
+    ctx.fillStyle = '#ffea00';
+    ctx.beginPath();
+    ctx.arc(tip.x, LANE_Y[tip.lane] + 8, 6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#000';
+    ctx.font = '8px "Press Start 2P"';
+    ctx.fillText('$', tip.x - 3, LANE_Y[tip.lane] + 11);
+  }
+
+  // Draw Customers
+  for (let c of customers) {
+    drawCustomer(c);
+  }
+
+  // Draw Full Mugs
+  for (let mug of fullMugs) {
+    drawMug(mug.x, LANE_Y[mug.lane] + 4, true);
+  }
+
+  // Draw Empty Mugs
+  for (let mug of emptyMugs) {
+    drawMug(mug.x, LANE_Y[mug.lane] + 4, false);
+  }
+
+  // Draw Player Bartender
+  drawBartender();
+
+  // Draw Particles
+  for (let p of particles) {
+    ctx.fillStyle = p.color;
+    ctx.fillRect(p.x, p.y, 4, 4);
+  }
+
+  // Draw HUD (Score & Lives)
+  drawHUD();
+
+  if (gameState === 'LEVEL_COMPLETE') {
+    ctx.fillStyle = '#ffea00';
+    ctx.font = '20px "Press Start 2P"';
+    ctx.textAlign = 'center';
+    ctx.fillText('LEVEL CLEAR!', canvas.width / 2, 280);
+    ctx.fillText('GET READY FOR NEXT LEVEL', canvas.width / 2, 330);
+  } else if (gameState === 'GAMEOVER') {
+    ctx.fillStyle = '#ff3333';
+    ctx.font = '28px "Press Start 2P"';
+    ctx.textAlign = 'center';
+    ctx.fillText('GAME OVER', canvas.width / 2, 280);
+    ctx.fillStyle = '#fff';
+    ctx.font = '14px "Press Start 2P"';
+    ctx.fillText('PRESS SPACE TO RESTART', canvas.width / 2, 340);
+  }
+}
+
+function drawSaloonBackground() {
+  // Wood wall texture background
+  ctx.fillStyle = '#1c0f0a';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Top Budweiser Banner
+  ctx.fillStyle = '#8b0000';
+  ctx.fillRect(250, 20, 300, 50);
+  ctx.strokeStyle = '#d4af37';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(250, 20, 300, 50);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '16px "Press Start 2P"';
+  ctx.textAlign = 'center';
+  ctx.fillText('BUDWEISER', 400, 52);
+
+  // Draw 4 Bars with 3D Perspective Depth
+  for (let i = 0; i < LANES; i++) {
+    let y = LANE_Y[i];
+
+    // Left Saloon Door
+    ctx.fillStyle = '#5c3a21';
+    ctx.fillRect(BAR_LEFT - 40, y - 35, 30, 45);
+    ctx.fillStyle = '#d4af37';
+    ctx.fillRect(BAR_LEFT - 35, y - 20, 5, 5);
+
+    // Bar Counter surface
+    ctx.fillStyle = '#8b4513';
+    ctx.fillRect(BAR_LEFT, y, BAR_RIGHT - BAR_LEFT, 18);
+
+    // Bar Top Golden Trim
+    ctx.fillStyle = '#d4af37';
+    ctx.fillRect(BAR_LEFT, y, BAR_RIGHT - BAR_LEFT, 4);
+
+    // Bar Front Shading
+    ctx.fillStyle = '#5c2c0c';
+    ctx.fillRect(BAR_LEFT, y + 18, BAR_RIGHT - BAR_LEFT, 12);
+
+    // Keg Taps on Right Wall
+    ctx.fillStyle = '#a52a2a';
+    ctx.beginPath();
+    ctx.arc(TAP_X + 25, y - 10, 22, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#d4af37';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Tap Brass Handle
+    ctx.fillStyle = '#d4af37';
+    ctx.fillRect(TAP_X + 5, y - 15, 12, 6);
+    ctx.fillRect(TAP_X + 8, y - 28, 6, 18);
+  }
+}
+
+function drawBartender() {
+  let y = LANE_Y[player.lane] - 30;
+  let x = player.x;
+
+  // Bartender Sprite (Pixel Art style rendering)
+  // Head / Hair
+  ctx.fillStyle = '#222';
+  ctx.fillRect(x - 8, y - 18, 16, 8); // Hair
+  ctx.fillStyle = '#ffcc99';
+  ctx.fillRect(x - 8, y - 10, 16, 10); // Face
+  
+  // Eyes & Mustache
+  ctx.fillStyle = '#000';
+  ctx.fillRect(x + (player.x >= TAP_X ? -6 : 2), y - 7, 3, 3);
+  ctx.fillRect(x - 6, y - 3, 12, 3); // Mustache
+
+  // Bowtie
+  ctx.fillStyle = '#cc0000';
+  ctx.fillRect(x - 4, y, 8, 4);
+
+  // Blue Vest & White Shirt
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(x - 10, y + 4, 20, 16);
+  ctx.fillStyle = '#003399';
+  ctx.fillRect(x - 10, y + 4, 5, 16);
+  ctx.fillRect(x + 5, y + 4, 5, 16);
+
+  // Pants
+  ctx.fillStyle = '#4a2e18';
+  ctx.fillRect(x - 8, y + 20, 16, 14);
+
+  // Pouring Animation Progress Bar
+  if (player.isPouring) {
+    ctx.fillStyle = '#222';
+    ctx.fillRect(x - 15, y - 30, 30, 8);
+    ctx.fillStyle = '#ffea00';
+    ctx.fillRect(x - 13, y - 28, 26 * player.pourProgress, 4);
+  }
+}
+
+function drawCustomer(c) {
+  let y = LANE_Y[c.lane] - 28;
+  let x = c.x;
+
+  if (c.type === 'cowboy') {
+    // Cowboy Hat
+    ctx.fillStyle = '#006600';
+    ctx.fillRect(x - 14, y - 16, 28, 5);
+    ctx.fillRect(x - 8, y - 22, 16, 7);
+
+    // Face
+    ctx.fillStyle = '#ffcc99';
+    ctx.fillRect(x - 8, y - 11, 16, 10);
+
+    // Shirt / Body
+    ctx.fillStyle = '#cc3300';
+    ctx.fillRect(x - 10, y - 1, 20, 18);
+  } else if (c.type === 'patron') {
+    // Red Cap
+    ctx.fillStyle = '#cc0000';
+    ctx.fillRect(x - 10, y - 20, 20, 6);
+
+    // Face
+    ctx.fillStyle = '#f3a17c';
+    ctx.fillRect(x - 8, y - 14, 16, 10);
+
+    // Blue Shirt
+    ctx.fillStyle = '#0055aa';
+    ctx.fillRect(x - 10, y - 4, 20, 18);
+  } else {
+    // Biker / Muscle patron
+    ctx.fillStyle = '#333';
+    ctx.fillRect(x - 10, y - 22, 20, 8); // Bandana
+    ctx.fillStyle = '#e0986c';
+    ctx.fillRect(x - 8, y - 14, 16, 10);
+    ctx.fillStyle = '#111';
+    ctx.fillRect(x - 12, y - 4, 24, 18); // Leather Vest
+  }
+
+  // Drinking pose mug
+  if (c.state === 'drinking') {
+    drawMug(x + 12, y + 8, true);
+  }
+}
+
+function drawMug(x, y, isFull) {
+  // Glass Outline
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(x - 6, y - 10, 12, 14);
+
+  if (isFull) {
+    // Amber Liquid
+    ctx.fillStyle = '#ffaa00';
+    ctx.fillRect(x - 4, y - 6, 8, 9);
+    // Foam Top
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(x - 5, y - 10, 10, 4);
+  } else {
+    // Empty Glass Inner
+    ctx.fillStyle = '#1c0f0a';
+    ctx.fillRect(x - 4, y - 8, 8, 11);
+  }
+
+  // Handle
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(x + 5, y - 7, 4, 8);
+}
+
+function drawHUD() {
+  ctx.fillStyle = '#ffff00';
+  ctx.font = '14px "Press Start 2P"';
+  ctx.textAlign = 'left';
+  ctx.fillText(`SCORE: ${score}`, 30, 40);
+
+  ctx.textAlign = 'right';
+  ctx.fillText(`LEVEL: ${level}`, canvas.width - 30, 40);
+
+  // Draw Mugs as Lives Indicators
+  ctx.textAlign = 'left';
+  ctx.fillText('LIVES:', 30, 580);
+  for (let i = 0; i < lives; i++) {
+    drawMug(130 + i * 22, 574, true);
+  }
+}
+
+function drawTitleScreen() {
+  ctx.fillStyle = '#ffea00';
+  ctx.font = '36px "Press Start 2P"';
+  ctx.textAlign = 'center';
+  ctx.fillText('TAPPER', canvas.width / 2, 180);
+
+  // Decorative Mug
+  drawMug(canvas.width / 2, 240, true);
+
+  ctx.fillStyle = '#fff';
+  ctx.font = '14px "Press Start 2P"';
+  ctx.fillText('SERVE BEERS & COLLECT MUGS', canvas.width / 2, 330);
+
+  ctx.fillStyle = '#00ffcc';
+  ctx.fillText('PRESS SPACE / TOUCH TO START', canvas.width / 2, 420);
+
+  ctx.fillStyle = '#aaa';
+  ctx.font = '10px "Press Start 2P"';
+  ctx.fillText('1983 BALLY MIDWAY ARCADE REMAKE', canvas.width / 2, 520);
+}
+
+// ============================================================================
+// MAIN GAME LOOP
+// ============================================================================
+function gameLoop() {
+  update();
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+
+// Start Game Loop
+requestAnimationFrame(gameLoop);
+</script>
+</body>
+</html>
