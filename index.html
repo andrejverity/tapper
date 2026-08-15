@@ -124,13 +124,23 @@
         0 0 15px rgba(0, 0, 0, 0.8);
     }
 
-    canvas {
+  canvas {
       display: block;
+      margin: 0 auto;
+      width: 100%;
+      max-width: 680px;
+      aspect-ratio: 4 / 3;
       background-color: #000;
-      border-radius: 12px;
+      border-radius: 20px;
+      border: 12px solid #1a110b;
+      box-shadow: 
+        0 0 25px rgba(0, 0, 0, 0.9),
+        inset 0 0 15px rgba(255, 255, 255, 0.1);
       image-rendering: pixelated;
       image-rendering: crisp-edges;
-    }
+  }
+
+
 
     /* CRT Scanline Overlay Effect */
     #crt-overlay {
