@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Tapper - Arcade Classic (1983)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,6 +30,10 @@
       justify-content: center;
       overflow-y: auto; /* Enables vertical scrolling when screen is too short */
       box-sizing: border-box;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+      overflow: hidden;
     }
 
     /* --- ARCADE CABINET WRAPPER --- */
@@ -328,6 +332,52 @@
   .move-plate {
     margin-bottom: 6px;
   }
+    /* Mobile Button Overlay */
+  #mobile-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    margin: 10px auto;
+    padding: 0 10px;
+    box-sizing: border-box;
+  }
+
+  .dpad-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 50px);
+    grid-template-rows: repeat(2, 50px);
+    gap: 5px;
+  }
+
+  .btn {
+    background: #333;
+    color: #fff;
+    border: 2px solid #ffea00;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    touch-action: none;
+  }
+
+  .btn:active {
+    background: #ffea00;
+    color: #000;
+  }
+
+  #btn-up    { grid-column: 2; grid-row: 1; }
+  #btn-left  { grid-column: 1; grid-row: 2; }
+  #btn-down  { grid-column: 2; grid-row: 2; }
+  #btn-right { grid-column: 3; grid-row: 2; }
+
+  #btn-pour {
+    width: 100px;
+    height: 105px;
+    background: #cc0000;
+    border-color: #ffffff;
+    font-size: 16px;
+  }
     
   </style>
 </head>
@@ -344,7 +394,9 @@
     <!-- Screen Bezel -->
     <div id="screen-bezel">
       <canvas id="gameCanvas" width="800" height="600"></canvas>
+     
       <div class="control-panel">
+        
         <!-- Left Side Brass Drink Holder -->
         <div class="drink-holder left">
           <div class="drink-rim"></div>
@@ -395,6 +447,14 @@
       <div><span class="key-badge">SPACE</span> Pour / Serve Beer</div>
       <div><span class="key-badge">M</span> Mute / Unmute Music</div>
     </div>
+    <div id="mobile-controls">
+    <div class="dpad-grid">
+      <button class="btn" id="btn-up">▲</button>
+      <button class="btn" id="btn-left">◀</button>
+      <button class="btn" id="btn-down">▼</button>
+      <button class="btn" id="btn-right">▶</button>
+    </div>
+    <button class="btn" id="btn-pour">POUR</button>
   </div>
 
 <script>
@@ -420,6 +480,51 @@ class SoundEngine {
     }
   }
 
+// State tracking for held buttons (Left / Right running)
+const touchState = { left: false, right: false };
+
+function setupMobileControls() {
+  const bindTouch = (id, onStart, onEnd) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    el.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      sound.init(); // Mobile Audio Context unlock on first touch
+      if (onStart) onStart();
+    });
+
+    el.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      if (onEnd) onEnd();
+    });
+  };
+
+  // Lane switching
+  bindTouch('btn-up', () => {
+    if (player.lane > 0) player.lane--;
+  });
+  
+  bindTouch('btn-down', () => {
+    if (player.lane < 3) player.lane++;
+  });
+
+  // Running along bar (holding buttons)
+  bindTouch('btn-left',  () => { touchState.left = true; },  () => { touchState.left = false; });
+  bindTouch('btn-right', () => { touchState.right = true; }, () => { touchState.right = false; });
+
+  // Pouring beer
+  bindTouch('btn-pour', () => {
+    if (!player.isPouring) {
+      player.isPouring = true;
+      player.pourProgress = 0;
+    }
+  });
+}
+
+// Call once when window loads
+setupMobileControls();
+  
 playMusic() {
     this.init();
     if (this.musicInterval) return; // Prevent multiple music loops
@@ -727,10 +832,12 @@ function update() {
   }
 
   // Player Movement along the bar
-  if (keys['ArrowLeft']) {
-    player.x = Math.max(BAR_LEFT + 20, player.x - player.speed);
-  } else if (keys['ArrowRight']) {
-    player.x = Math.min(TAP_X, player.x + player.speed);
+    if (keys['ArrowLeft'] || touchState.left) {
+      player.x = Math.max(BAR_LEFT, player.x - 4);
+    }
+    if (keys['ArrowRight'] || touchState.right) {
+      player.x = Math.min(TAP_X, player.x + 4);
+}
   }
 
   // Pouring Beer Logic
