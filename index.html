@@ -189,6 +189,143 @@
       display: inline-block;
       margin: 2px;
     }
+
+/* Woodgrain Control Panel Deck */
+.control-panel {
+  position: relative;
+  width: 100%;
+  max-width: 680px;
+  height: 140px;
+  margin: 0 auto;
+  background: linear-gradient(180deg, #6a3416 0%, #3d1c0a 100%);
+  border: 4px solid #221006;
+  border-top: 6px solid #8f4820;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: space-evenly;
+  align-items: flex-end;
+  padding-bottom: 12px;
+  box-sizing: border-box;
+}
+
+/* Side Brass Drink Holders */
+.drink-holder {
+  position: absolute;
+  top: 10px;
+  width: 52px;
+  height: 110px;
+  background: linear-gradient(90deg, #a88434 0%, #f7e08b 40%, #85621d 100%);
+  border-radius: 8px;
+  border: 2px solid #4a340a;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7);
+}
+.drink-holder.left { left: 8px; }
+.drink-holder.right { right: 8px; }
+.drink-rim {
+  width: 100%;
+  height: 24px;
+  background: radial-gradient(ellipse at center, #1a1005 60%, #c49a3c 100%);
+  border-radius: 50%;
+  border: 2px solid #d8ac47;
+}
+
+/* Control Elements Layout */
+.control-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+}
+.center-group {
+  margin: 0 20px;
+}
+
+/* Red Ball-Top Joystick */
+.joystick {
+  position: relative;
+  width: 60px;
+  height: 65px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+.washer {
+  position: absolute;
+  bottom: 0;
+  width: 46px;
+  height: 14px;
+  background: radial-gradient(ellipse, #111 50%, #444 100%);
+  border-radius: 50%;
+}
+.stick {
+  position: absolute;
+  bottom: 8px;
+  width: 10px;
+  height: 38px;
+  background: linear-gradient(90deg, #999, #fff, #555);
+  border-radius: 2px;
+}
+.ball-top {
+  position: absolute;
+  top: 0;
+  width: 32px;
+  height: 32px;
+  background: radial-gradient(circle at 35% 35%, #ff4d4d, #990000 70%, #4a0000 100%);
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+}
+
+/* Budweiser Beer Tap Levers */
+.tap-handle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.tap-top {
+  width: 26px;
+  height: 42px;
+  background: linear-gradient(180deg, #ffffff 0%, #e6e6e6 70%, #cc0000 70%, #990000 100%);
+  border: 2px solid #222;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 9px;
+  font-weight: bold;
+  color: #fff;
+  text-align: center;
+  line-height: 28px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.5);
+}
+.tap-stem {
+  width: 8px;
+  height: 18px;
+  background: linear-gradient(90deg, #888, #fff, #444);
+}
+.tap-base {
+  width: 28px;
+  height: 10px;
+  background: #111;
+  border-radius: 3px;
+}
+
+  /* Brass Instruction Plates */
+  .brass-plate {
+    margin-top: 6px;
+    padding: 2px 10px;
+    background: linear-gradient(180deg, #ebd181 0%, #a88134 100%);
+    border: 1px solid #573e0e;
+    border-radius: 3px;
+    color: #2b1a03;
+    font-family: sans-serif;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  .move-plate {
+    margin-bottom: 6px;
+  }
+    
   </style>
 </head>
 <body>
@@ -204,6 +341,47 @@
     <!-- Screen Bezel -->
     <div id="screen-bezel">
       <canvas id="gameCanvas" width="800" height="600"></canvas>
+      <div class="control-panel">
+        <!-- Left Side Brass Drink Holder -->
+        <div class="drink-holder left">
+          <div class="drink-rim"></div>
+        </div>
+      
+        <!-- Left Pour Handle (Budweiser Tap) -->
+        <div class="control-group">
+          <div class="tap-handle">
+            <div class="tap-top">BUD</div>
+            <div class="tap-stem"></div>
+            <div class="tap-base"></div>
+          </div>
+          <div class="brass-plate">POUR</div>
+        </div>
+      
+        <!-- Center Joystick (Move Bartender) -->
+        <div class="control-group center-group">
+          <div class="brass-plate move-plate">MOVE BARTENDER</div>
+          <div class="joystick">
+            <div class="ball-top"></div>
+            <div class="stick"></div>
+            <div class="washer"></div>
+          </div>
+        </div>
+      
+        <!-- Right Pour Handle (Budweiser Tap) -->
+        <div class="control-group">
+          <div class="tap-handle">
+            <div class="tap-top">BUD</div>
+            <div class="tap-stem"></div>
+            <div class="tap-base"></div>
+          </div>
+          <div class="brass-plate">POUR</div>
+        </div>
+      
+        <!-- Right Side Brass Drink Holder -->
+        <div class="drink-holder right">
+          <div class="drink-rim"></div>
+        </div>
+      </div>
       <div id="crt-overlay"></div>
     </div>
 
