@@ -437,7 +437,7 @@ playMusic() {
       osc.type = 'square'; // Retro arcade wave
       osc.frequency.setValueAtTime(notes[noteIndex], this.ctx.currentTime);
       
-      gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
+      gain.gain.setValueAtTime(0.015, this.ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.18);
       
       osc.connect(gain);
