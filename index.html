@@ -681,8 +681,9 @@ function startLevel() {
   player.pourProgress = 0;
   levelCustomersLeft = 6 + level * 3;
   spawnTimer = 0;
+  sound.playMusic();
 }
- sound.playMusic();
+
 
   function spawnCustomer() {
   if (levelCustomersLeft <= 0) return;
