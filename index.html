@@ -16,17 +16,20 @@
     }
 
     body {
-      background-color: #0d0a08;
-      background-image: 
-        radial-gradient(circle at 50% 30%, #2a1f18 0%, #080503 100%),
-        repeating-linear-gradient(45deg, #110d0a 0px, #110d0a 10px, #0a0705 10px, #0a0705 20px);
-      font-family: 'Press Start 2P', monospace, sans-serif;
+      margin: 0;
+      padding: 20px 10px;
       min-height: 100vh;
+      background-color: #0d0805;
+      background-image: 
+            radial-gradient(circle at 50% 30%, #2a1f18 0%, #080503 100%),
+            repeating-linear-gradient(45deg, #110d0a 0px, #110d0a 10px, #0a0705 10px, #0a0705 20px);
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
       color: #fff;
-      overflow: hidden;
+      justify-content: center;
+      overflow-y: auto; /* Enables vertical scrolling when screen is too short */
+      box-sizing: border-box;
     }
 
     /* --- ARCADE CABINET WRAPPER --- */
